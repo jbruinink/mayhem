@@ -1,22 +1,25 @@
 package com.jdriven.mayhem
 
 import com.jdriven.mayhem.game.*
+import io.jenetics.Chromosome
+import io.jenetics.Genotype
+import io.jenetics.IntegerGene
 import io.netty.channel.ChannelHandlerContext
 import ninja.robbert.mayhem.api.*
 
-class ScoredActionStrategy(val allWeights: List<Int>) : GameStrategy {
+class GeneticGameStrategy(genotype: Genotype<IntegerGene>) : GameStrategy {
 
     private val actionExecutorFactories: List<ActionExecutorFactory> = Skill.values().flatMap { skill ->
         Team.values().flatMap { team ->
             Player.values().filter { target -> skill.targetFilter(team, target) }
                 .map { target ->
-                    { weights: List<Int> -> ActualActionExecutorFactory(skill.player, skill, team, target, weights) }
+                    { chromosome: Chromosome<IntegerGene> -> ActualActionExecutorFactory(skill.player, skill, team, target, chromosome.map {it.allele()}) }
                 }
         }
     }
         .plus(Player.values().map { player ->
-            { weights: List<Int> -> NoActionExecutorFactory(player, weights) }
-        }).zip(allWeights.chunked(30))
+            { chromosome: Chromosome<IntegerGene> -> NoActionExecutorFactory(player, chromosome.map { it.allele() }) }
+        }).zip(genotype)
         .map { (a, b) -> a.invoke(b) }
 
     override fun handle(msg: StatusMessage, ctx: ChannelHandlerContext) {

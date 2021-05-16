@@ -14,12 +14,7 @@ class MayhemEvaluator(
 ) : Evaluator<IntegerGene, Int> {
 
     override fun eval(population: Seq<Phenotype<IntegerGene, Int>>): ISeq<Phenotype<IntegerGene, Int>> {
-        val futures = population.map { phenotype ->
-            client.play(
-                ScoredActionStrategy(
-                    phenotype.genotype().chromosome().map { it.allele() })
-            )
-        }.toList()
+        val futures = population.map { phenotype -> client.play(GeneticGameStrategy(phenotype.genotype())) }.toList()
 
         return ISeq.of(population.zip(futures).map { (phenotype, future) ->
             val gameResult = future.get()

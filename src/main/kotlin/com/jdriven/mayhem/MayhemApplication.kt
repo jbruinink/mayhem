@@ -1,13 +1,12 @@
 package com.jdriven.mayhem
 
-import io.jenetics.Genotype
-import io.jenetics.IntegerChromosome
-import io.jenetics.IntegerGene
+import io.jenetics.*
 import io.jenetics.engine.Engine
 import io.jenetics.engine.EvolutionResult
 import io.jenetics.engine.EvolutionStatistics
 import io.jenetics.stat.DoubleMomentStatistics
 import io.jenetics.util.Factory
+import io.jenetics.util.Seq
 import io.netty.channel.nio.NioEventLoopGroup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
@@ -16,7 +15,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import java.io.*
+import java.io.BufferedReader
+import java.io.FileOutputStream
+import java.io.FileReader
+import java.io.PrintWriter
+import java.util.stream.Stream
+import kotlin.streams.asStream
 import kotlin.streams.toList
 
 @SpringBootApplication
@@ -30,29 +34,47 @@ class MayhemApplication() : ApplicationRunner {
         val statistics: EvolutionStatistics<Int, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
-            .limit(3)
-            .peek(statistics)
+            .limit(50)
+            .peek {
+                statistics.accept(it)
+                println(statistics)
+                val weights = it.weights()
+                println(weights)
+                PrintWriter(FileOutputStream("weights.txt")).use { out -> weights.forEach(out::println) }
+            }
             .collect(EvolutionResult.toBestEvolutionResult())
-
-        val weights = result.bestPhenotype().genotype().chromosome().map(IntegerGene::allele)
-        PrintWriter(FileOutputStream("weights.txt")).use { out -> weights.forEach(out::println) }
-
-        println(statistics)
-        println(weights)
     }
 
     @Bean
-    fun factory() = Factory<Genotype<IntegerGene>> {
-        BufferedReader(FileReader("weights.txt")).use { reader ->
-            val genes = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList()
-            Genotype.of(IntegerChromosome.of(genes))
-    }
-//        Genotype.of(IntegerChromosome.of(-1000, 1000, 30 * 52))
+    fun factory() = object : Factory<Genotype<IntegerGene>> {
+        private val genotype: Genotype<IntegerGene>
+
+        init {
+            BufferedReader(FileReader("weights.txt")).use { reader ->
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.toList().chunked(30)
+                genotype = Genotype.of(weights.map { IntegerChromosome.of(it)})
+            }
+        }
+
+        override fun newInstance(): Genotype<IntegerGene> = genotype
+
+        override fun instances(): Stream<Genotype<IntegerGene>> {
+            val mutator = GaussianMutator<IntegerGene, Int>(0.01)
+
+            return generateSequence(genotype) { genotype ->
+                mutator.alter(Seq.of(Phenotype.of(genotype, 0)), 0).population().first().genotype()
+            }.asStream()
+        }
+
+        //        Genotype.of(IntegerChromosome.of(-1000, 1000, 30 * 52))
     }
 
     @Bean
     fun eventLoopGroup() = NioEventLoopGroup()
 }
+
+private fun EvolutionResult<IntegerGene, Int>.weights() =
+    bestPhenotype().genotype().flatMap { chromosome ->  chromosome.map(IntegerGene::allele)}
 
 fun main(args: Array<String>) {
     runApplication<MayhemApplication>(*args)
