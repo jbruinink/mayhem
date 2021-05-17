@@ -1,8 +1,7 @@
 package com.jdriven.mayhem.game
 
-import io.netty.channel.ChannelHandlerContext
-import ninja.robbert.mayhem.api.*
+import ninja.robbert.mayhem.api.StatusMessage
 
 interface GameStrategy {
-    fun handle(msg: StatusMessage, ctx: ChannelHandlerContext)
+    fun createResponse(msg: StatusMessage): Collection<Action>
 }
