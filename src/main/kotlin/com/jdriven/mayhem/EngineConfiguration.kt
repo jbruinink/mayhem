@@ -14,10 +14,11 @@ class EngineConfiguration {
 
         return Engine.Builder(evaluator, factory)
             .populationSize(20)
-//            .alterers(
-//                GaussianMutator(),
-//                MultiPointCrossover(2)
-//            )
+            .alterers(
+//                { population, _ -> AltererResult.of(population, 0) }
+                GaussianMutator(0.05),
+                MultiPointCrossover(0.01, 2)
+            )
             .build()
     }
 }
