@@ -13,7 +13,7 @@ class EngineConfiguration {
     fun engine(evaluator: MayhemEvaluator, factory: Factory<Genotype<IntegerGene>>): Engine<IntegerGene, Int> {
 
         return Engine.Builder(evaluator, factory)
-            .populationSize(20)
+            .populationSize(200)
             .alterers(
 //                { population, _ -> AltererResult.of(population, 0) }
                 GaussianMutator(0.05),

@@ -39,7 +39,6 @@ class MayhemApplication() : ApplicationRunner {
                 statistics.accept(it)
                 println(statistics)
                 val weights = it.weights()
-                println(weights)
                 PrintWriter(FileOutputStream("weights.txt")).use { out -> weights.forEach(out::println) }
             }
             .collect(EvolutionResult.toBestEvolutionResult())
@@ -47,23 +46,28 @@ class MayhemApplication() : ApplicationRunner {
 
     @Bean
     fun factory() = object : Factory<Genotype<IntegerGene>> {
-        private val genotype: Genotype<IntegerGene>
+        private val genotypes: List<Genotype<IntegerGene>>
 
         init {
             BufferedReader(FileReader("weights.txt")).use { reader ->
-                val weights = reader.lines().map { IntegerGene.of(it.toInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.toList().chunked(30)
-                genotype = Genotype.of(weights.map { IntegerChromosome.of(it)})
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.toList().chunked(12).chunked(49)
+//                val weights = ThreadLocalRandom.current().let { rnd ->
+//                    (0..12 * 49).map { IntegerGene.of(rnd.nextInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.chunked(12)
+//                }
+                genotypes = weights.map {w -> Genotype.of(w.map { IntegerChromosome.of(it) })}
             }
         }
 
-        override fun newInstance(): Genotype<IntegerGene> = genotype
+        override fun newInstance(): Genotype<IntegerGene> = genotypes.first()
 
         override fun instances(): Stream<Genotype<IntegerGene>> {
             val mutator = GaussianMutator<IntegerGene, Int>(0.01)
 
-            return generateSequence(genotype) { genotype ->
-                mutator.alter(Seq.of(Phenotype.of(genotype, 0)), 0).population().first().genotype()
-            }.asStream()
+//            return generateSequence(genotypes) { genotype ->
+//                mutator.alter(Seq.of(Phenotype.of(genotype, 0)), 0).population().first().genotype()
+//            }.asStream()
+
+            return genotypes.stream()
         }
 
         //        Genotype.of(IntegerChromosome.of(-1000, 1000, 30 * 52))
@@ -74,7 +78,7 @@ class MayhemApplication() : ApplicationRunner {
 }
 
 private fun EvolutionResult<IntegerGene, Int>.weights() =
-    bestPhenotype().genotype().flatMap { chromosome ->  chromosome.map(IntegerGene::allele)}
+    genotypes().flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
 
 fun main(args: Array<String>) {
     runApplication<MayhemApplication>(*args)

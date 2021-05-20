@@ -14,9 +14,10 @@ class MayhemProtocolHandler(
     private val logger = LoggerFactory.getLogger(MayhemProtocolHandler::class.java)
     private val actionQueue: Queue<Action> = LinkedList()
 
-    private var effects = Effects(0, 0, 0, 0, 0)
     private var matchStart = 0L
     private var totalMatchTime = 0L
+    private var matchesPlayed = 0
+    private var matchesWon = 0
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         when (msg) {
@@ -31,9 +32,6 @@ class MayhemProtocolHandler(
     private fun handleAccepted(msg: AcceptMessage, ctx: ChannelHandlerContext) {
         val action = actionQueue.remove()
         logger.debug("accepted {} {}", action, msg.timestamp)
-
-        effects += action.effects
-
         sendNextAction(ctx)
     }
 
@@ -59,18 +57,21 @@ class MayhemProtocolHandler(
     }
 
     private fun handle(msg: StatusMessage, ctx: ChannelHandlerContext) {
-        if(msg.status == StatusMessage.FightStatus.ready) {
+        if (msg.status == StatusMessage.FightStatus.ready) {
             matchStart = msg.timestamp.time
         }
 
-        if(msg.status == StatusMessage.FightStatus.finished) {
+        if (msg.status == StatusMessage.FightStatus.finished) {
             totalMatchTime += msg.timestamp.time - matchStart
+            matchesPlayed++
+            if(msg.result == StatusMessage.FightResult.win ) {
+                matchesWon++
+            }
         }
 
-        if (msg.competitionResult != null) {
+        if (msg.competitionResult != null || matchesPlayed >= 5) {
             ctx.close().addListener {
-                resultCallback.invoke(msg.competitionResult.first { it.name == account.name }
-                    .let { GameResult(it.wins, effects, totalMatchTime.toInt()) })
+                resultCallback.invoke(GameResult(matchesWon, totalMatchTime.toInt()))
             }
         } else if (actionQueue.size < 5) {
             val actions = strategy.createResponse(msg)
@@ -81,5 +82,33 @@ class MayhemProtocolHandler(
                 actionQueue.addAll(actions)
             }
         }
+    }
+
+    override fun channelRegistered(ctx: ChannelHandlerContext?) {
+        super.channelRegistered(ctx)
+    }
+
+    override fun channelUnregistered(ctx: ChannelHandlerContext?) {
+        super.channelUnregistered(ctx)
+    }
+
+    override fun channelActive(ctx: ChannelHandlerContext?) {
+        super.channelActive(ctx)
+    }
+
+    override fun channelInactive(ctx: ChannelHandlerContext?) {
+        super.channelInactive(ctx)
+    }
+
+    override fun channelReadComplete(ctx: ChannelHandlerContext?) {
+        super.channelReadComplete(ctx)
+    }
+
+    override fun userEventTriggered(ctx: ChannelHandlerContext?, evt: Any?) {
+        super.userEventTriggered(ctx, evt)
+    }
+
+    override fun channelWritabilityChanged(ctx: ChannelHandlerContext?) {
+        super.channelWritabilityChanged(ctx)
     }
 }

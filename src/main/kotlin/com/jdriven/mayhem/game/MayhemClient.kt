@@ -6,12 +6,13 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.LineBasedFrameDecoder
+import io.netty.handler.logging.LogLevel
 import io.netty.handler.logging.LoggingHandler
 import ninja.robbert.mayhem.api.StatusMessage
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 
-@Component
+//@Component
 class MayhemClient(
     private val serverConfig: ServerConfigurationProperties,
     private val eventLoopGroup: EventLoopGroup,
@@ -29,7 +30,7 @@ class MayhemClient(
         bootstrap.handler(object : ChannelInitializer<NioSocketChannel>() {
             override fun initChannel(ch: NioSocketChannel) {
                 ch.pipeline().addLast(
-                    LoggingHandler(),
+//                    LoggingHandler(LogLevel.INFO),
                     LineBasedFrameDecoder(Int.MAX_VALUE),
                     LineBasedFrameEncoder(),
                     MayhemMessageCodec(objectMapper),
