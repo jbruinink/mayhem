@@ -15,8 +15,8 @@ class EngineConfiguration {
         return Engine.Builder(evaluator, factory)
             .populationSize(200)
             .alterers(
-                LineCrossover(0.2, 1.1),
-                GaussianMutator(0.005)
+                LineCrossover(0.4, 1.1),
+                GaussianMutator(0.003)
             )
             .selector(EliteSelector(5, RouletteWheelSelector()))
             .offspringFraction(0.7)
