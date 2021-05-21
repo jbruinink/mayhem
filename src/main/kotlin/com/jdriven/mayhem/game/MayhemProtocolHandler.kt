@@ -71,7 +71,7 @@ class MayhemProtocolHandler(
             }
         }
 
-        if (msg.competitionResult != null || matchesPlayed >= 5) {
+        if (msg.competitionResult != null || matchesPlayed >= 8) {
             ctx.close().addListener {
                 resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
             }
