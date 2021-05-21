@@ -17,7 +17,8 @@ class ActionFactory(
         val target = targetTeam(statusMessage).first { it.name.equals(targetPlayer.text) }
         val skill = hero.skills.first { it.name == skill.text }
 
-        if (!hero.isAlive || hero.isBusy || hero.power + skill.power < 0 || hero.cooldowns.contains(skill.name) || !target.isAlive
+        if (!hero.isAlive || hero.isBusy || hero.power + skill.power < 0 || hero.cooldowns.contains(skill.id) ||
+            !target.isAlive || target.buffs.contains(skill.name)
         ) {
             return null
         }
