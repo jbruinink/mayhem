@@ -18,8 +18,8 @@ class EngineConfiguration {
                 MultiPointCrossover(0.01, 2),
                 GaussianMutator(0.02)
             )
-            .selector(EliteSelector(5, ExponentialRankSelector(0.9)))
-            .offspringFraction(0.8)
+            .selector(EliteSelector(5, RouletteWheelSelector()))
+            .offspringFraction(0.7)
             .build()
     }
 }
