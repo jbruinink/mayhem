@@ -46,7 +46,9 @@ class MayhemEvaluator(
 
         val result = ISeq.of(population.zip(futures).map { (phenotype, future) ->
             val gameResult = future.get()
-            phenotype.withFitness(gameResult.wins + 1000f / gameResult.totalMatchTime)
+            phenotype.withFitness(4 * gameResult.wins + //win the match
+                    gameResult.kills + //kill the enemy heroes
+                    1000f / gameResult.totalMatchTime) // do it quickly
         })
 
         container.stop()

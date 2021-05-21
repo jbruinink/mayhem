@@ -16,6 +16,7 @@ class MayhemProtocolHandler(
 
     private var matchStart = 0L
     private var totalMatchTime = 0L
+    private var kills = 0
     private var matchesPlayed = 0
     private var matchesWon = 0
 
@@ -64,6 +65,7 @@ class MayhemProtocolHandler(
         if (msg.status == StatusMessage.FightStatus.finished) {
             totalMatchTime += msg.timestamp.time - matchStart
             matchesPlayed++
+            kills += msg.opponent.count { !it.isAlive }
             if(msg.result == StatusMessage.FightResult.win ) {
                 matchesWon++
             }
@@ -71,7 +73,7 @@ class MayhemProtocolHandler(
 
         if (msg.competitionResult != null || matchesPlayed >= 5) {
             ctx.close().addListener {
-                resultCallback.invoke(GameResult(matchesWon, totalMatchTime.toInt()))
+                resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
             }
         } else if (actionQueue.size < 5) {
             val actions = strategy.createResponse(msg)
@@ -84,31 +86,9 @@ class MayhemProtocolHandler(
         }
     }
 
-    override fun channelRegistered(ctx: ChannelHandlerContext?) {
-        super.channelRegistered(ctx)
-    }
-
-    override fun channelUnregistered(ctx: ChannelHandlerContext?) {
-        super.channelUnregistered(ctx)
-    }
-
-    override fun channelActive(ctx: ChannelHandlerContext?) {
-        super.channelActive(ctx)
-    }
-
-    override fun channelInactive(ctx: ChannelHandlerContext?) {
-        super.channelInactive(ctx)
-    }
-
-    override fun channelReadComplete(ctx: ChannelHandlerContext?) {
-        super.channelReadComplete(ctx)
-    }
-
-    override fun userEventTriggered(ctx: ChannelHandlerContext?, evt: Any?) {
-        super.userEventTriggered(ctx, evt)
-    }
-
-    override fun channelWritabilityChanged(ctx: ChannelHandlerContext?) {
-        super.channelWritabilityChanged(ctx)
+    override fun channelInactive(ctx: ChannelHandlerContext) {
+        ctx.close().addListener {
+            resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
+        }
     }
 }
