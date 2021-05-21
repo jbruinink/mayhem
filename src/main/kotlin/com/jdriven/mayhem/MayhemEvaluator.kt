@@ -39,7 +39,7 @@ class MayhemEvaluator(
             container.getMappedPort(1337),
             container.getMappedPort(8080)
         )
-        log.info("Starting matches, watch them at http://${serverConfig.address}:${serverConfig.webPort}")
+        log.info("Starting matches, watch them at http://${serverConfig.address.canonicalHostName}:${serverConfig.webPort}")
 
         val client = MayhemClient(serverConfig, eventLoopGroup, objectMapper, accountGenerator)
         val futures = population.map { phenotype -> client.play(GeneticGameStrategy(phenotype.genotype())) }.toList()
