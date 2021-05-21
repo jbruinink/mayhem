@@ -1,4 +1,5 @@
 mayhem:
   server:
     address: localhost
-    port: 1337
+    gamePort: 1337
+    webPort: 8080
