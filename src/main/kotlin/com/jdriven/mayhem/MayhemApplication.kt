@@ -19,6 +19,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
+import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import kotlin.streams.toList
@@ -28,13 +29,13 @@ import kotlin.streams.toList
 class MayhemApplication() : ApplicationRunner {
 
     @Autowired
-    lateinit var engine: Engine<IntegerGene, Int>
+    lateinit var engine: Engine<IntegerGene, Float>
 
     override fun run(args: ApplicationArguments?) {
-        val statistics: EvolutionStatistics<Int, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
+        val statistics: EvolutionStatistics<Float, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
-            .limit(50)
+            .limit(5000)
             .peek {
                 statistics.accept(it)
                 println(statistics)
@@ -50,10 +51,10 @@ class MayhemApplication() : ApplicationRunner {
 
         init {
             BufferedReader(FileReader("weights.txt")).use { reader ->
-                val weights = reader.lines().map { IntegerGene.of(it.toInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.toList().chunked(12).chunked(49)
-//                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..12 * 49).map { IntegerGene.of(rnd.nextInt(), Int.MIN_VALUE, Int.MAX_VALUE) }.chunked(12)
-//                }
+//                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(12).chunked(49)
+                val weights = ThreadLocalRandom.current().let { rnd ->
+                    (0..12 * 49 * 200).map { IntegerGene.of(/*rnd.nextInt(-1000, 1000)*/1, -1000, 1000) }.chunked(12).chunked(49)
+                }
                 genotypes = weights.map {w -> Genotype.of(w.map { IntegerChromosome.of(it) })}
             }
         }
@@ -77,7 +78,7 @@ class MayhemApplication() : ApplicationRunner {
     fun eventLoopGroup() = NioEventLoopGroup()
 }
 
-private fun EvolutionResult<IntegerGene, Int>.weights() =
+private fun EvolutionResult<IntegerGene, Float>.weights() =
     genotypes().flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
 
 fun main(args: Array<String>) {

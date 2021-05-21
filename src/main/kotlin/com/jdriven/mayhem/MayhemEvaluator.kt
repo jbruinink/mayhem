@@ -24,10 +24,10 @@ class MayhemEvaluator(
     val eventLoopGroup: EventLoopGroup,
     val objectMapper: ObjectMapper,
     val accountGenerator: AccountGenerator
-) : Evaluator<IntegerGene, Int> {
+) : Evaluator<IntegerGene, Float> {
     private val log = LoggerFactory.getLogger(MayhemEvaluator::class.java)
 
-    override fun eval(population: Seq<Phenotype<IntegerGene, Int>>): ISeq<Phenotype<IntegerGene, Int>> {
+    override fun eval(population: Seq<Phenotype<IntegerGene, Float>>): ISeq<Phenotype<IntegerGene, Float>> {
         val container: GenericContainer<*> =
             GenericContainer<Nothing>(DockerImageName.parse("robbert1/mayhem-server:1.1.0"))
 //                .apply { withLogConsumer(Slf4jLogConsumer(log)) }
@@ -46,7 +46,7 @@ class MayhemEvaluator(
 
         val result = ISeq.of(population.zip(futures).map { (phenotype, future) ->
             val gameResult = future.get()
-            phenotype.withFitness((100000 * gameResult.wins) / gameResult.totalMatchTime)
+            phenotype.withFitness(gameResult.wins + 1000f / gameResult.totalMatchTime)
         })
 
         container.stop()
