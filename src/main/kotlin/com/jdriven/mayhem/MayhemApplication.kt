@@ -19,6 +19,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
+import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.streams.toList
 
@@ -52,9 +53,9 @@ class MayhemApplication() : ApplicationRunner {
 
         init {
             BufferedReader(FileReader("weights.txt")).use { reader ->
-                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(12).chunked(49)
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(4).chunked(49)
 //                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..12 * 49 * 200).map { IntegerGene.of(/*rnd.nextInt(-1000, 1000)*/1, -1000, 1000) }.chunked(12).chunked(49)
+//                    (0..4 * 49 * 200).map { IntegerGene.of(0, -1000, 1000) }.chunked(4).chunked(49)
 //                }
                 genotypes = weights.map {w -> Genotype.of(w.map { IntegerChromosome.of(it) })}
             }
@@ -63,16 +64,8 @@ class MayhemApplication() : ApplicationRunner {
         override fun newInstance(): Genotype<IntegerGene> = genotypes.first()
 
         override fun instances(): Stream<Genotype<IntegerGene>> {
-            val mutator = GaussianMutator<IntegerGene, Int>(0.01)
-
-//            return generateSequence(genotypes) { genotype ->
-//                mutator.alter(Seq.of(Phenotype.of(genotype, 0)), 0).population().first().genotype()
-//            }.asStream()
-
             return genotypes.stream()
         }
-
-        //        Genotype.of(IntegerChromosome.of(-1000, 1000, 30 * 52))
     }
 
     @Bean

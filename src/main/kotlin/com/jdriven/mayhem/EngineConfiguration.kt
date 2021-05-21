@@ -16,7 +16,7 @@ class EngineConfiguration {
             .populationSize(200)
             .alterers(
                 LineCrossover(0.01, 5.0),
-                GaussianMutator(0.01)
+                GaussianMutator(0.05)
             )
             .selector(EliteSelector(5, RouletteWheelSelector()))
             .offspringFraction(0.7)

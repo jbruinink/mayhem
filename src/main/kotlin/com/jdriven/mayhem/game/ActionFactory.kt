@@ -3,6 +3,7 @@ package com.jdriven.mayhem.game
 import ninja.robbert.mayhem.api.Hero
 import ninja.robbert.mayhem.api.Hero.Skill.EffectType.*
 import ninja.robbert.mayhem.api.StatusMessage
+import kotlin.math.abs
 
 class ActionFactory(
     private val player: Player,
@@ -31,64 +32,44 @@ class ActionFactory(
     }
 
     private fun mapState(skill: Hero.Skill, target: Hero): List<Int> {
-        val healthEffect = if (skill.duration == 0) {
-            actualEffect(skill, target, health, Hero::getHealth, Hero::getMaxHealth)
-        } else {
-            0
-        }
-        val myPowerEffect = skill.power
-        val bias = 1
-        val targetPowerEffect = actualEffect(skill, target, power, Hero::getPower, Hero::getMaxPower)
-        val resistanceEffect = actualEffect(skill, target, resistance, Hero::getResistance) { 100 }
-        val armorEffect = actualEffect(skill, target, armor, Hero::getArmor) { 100 }
-        val maxHealthEffect = if (skill.duration > 0) {
-            actualEffect(skill, target, health, { 0 }, { 100 })
-        } else {
-            0
-        }
-        val expectedKill = if (skill.effect < 0 && healthEffect > target.health) {
-            1
-        } else {
-            0
-        }
+        val bias = 500
+        val (effect, expectedKill) = normalizedEffect(skill, target)
+
         return listOf(
             bias,
-            healthEffect,
-            myPowerEffect,
-            targetPowerEffect,
-            resistanceEffect,
-            armorEffect,
-            maxHealthEffect,
-            target.armor,
-            target.resistance,
-            target.power,
-            target.health,
+            effect,
+            (target.health * 1000) / 600,
             expectedKill
         )
     }
 
-    private fun actualEffect(
-        skill: Hero.Skill,
-        target: Hero,
-        type: Hero.Skill.EffectType,
-        current: (Hero) -> Int,
-        max: (Hero) -> Int
-    ): Int {
-        if (skill.type != type) {
-            return 0
+    private fun normalizedEffect(skill: Hero.Skill, target: Hero): Pair<Int, Int> {
+
+        val (current: Int, max: Int) = when (skill.type) {
+            health -> Pair(target.health, target.maxHealth)
+            power -> Pair(target.power, target.maxPower)
+            armor -> Pair(target.armor, 100)
+            resistance -> Pair(target.resistance, 100)
         }
 
-        val effect = when {
-            skill.effect > 0 -> skill.effect
-            skill.type == resistance || skill.type == armor -> skill.effect * -1
-            else -> skill.effect * -1 * (200 - target.resistance) * (100 - target.armor) / (200 * 100)
+        val effect = if (skill.effect > 0 || skill.type == resistance || skill.type == armor) {
+            skill.effect
+        } else {
+            skill.effect * -1 * (200 - target.resistance) * (100 - target.armor) / (200 * 100)
         }
+
         return if (skill.effect > 0) {
             //can't give more than max - current
-            effect.coerceAtMost(max.invoke(target) - current.invoke(target))
+            Pair(effect.coerceAtMost(max - current), 0)
         } else {
             //can't take more than current
-            effect.coerceAtMost(current.invoke(target))
+            Pair(
+                effect.coerceAtMost(current) * 1000 / abs(skill.effect), if (effect > target.health) {
+                    1000
+                } else {
+                    0
+                }
+            )
         }
     }
 
