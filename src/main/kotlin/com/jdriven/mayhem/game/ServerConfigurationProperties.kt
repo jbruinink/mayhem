@@ -8,5 +8,6 @@ import java.net.InetAddress
 @ConstructorBinding
 data class ServerConfigurationProperties(
     val address: InetAddress,
-    val port: Int
+    val gamePort: Int,
+    val webPort: Int
 )

@@ -6,7 +6,7 @@ import io.jenetics.engine.EvolutionResult
 import io.jenetics.engine.EvolutionStatistics
 import io.jenetics.stat.DoubleMomentStatistics
 import io.jenetics.util.Factory
-import io.jenetics.util.Seq
+import io.jenetics.util.ISeq
 import io.netty.channel.nio.NioEventLoopGroup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
@@ -19,9 +19,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
-import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
-import kotlin.streams.asStream
 import kotlin.streams.toList
 
 @SpringBootApplication
@@ -39,8 +37,11 @@ class MayhemApplication() : ApplicationRunner {
             .peek {
                 statistics.accept(it)
                 println(statistics)
-                val weights = it.weights()
+                val weights = it.genotypes().weights()
                 PrintWriter(FileOutputStream("weights.txt")).use { out -> weights.forEach(out::println) }
+
+                val bestWeights = ISeq.of(listOf(it.bestPhenotype().genotype())).weights()
+                PrintWriter(FileOutputStream("bestweights.txt")).use { out -> bestWeights.forEach(out::println) }
             }
             .collect(EvolutionResult.toBestEvolutionResult())
     }
@@ -51,10 +52,10 @@ class MayhemApplication() : ApplicationRunner {
 
         init {
             BufferedReader(FileReader("weights.txt")).use { reader ->
-//                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(12).chunked(49)
-                val weights = ThreadLocalRandom.current().let { rnd ->
-                    (0..12 * 49 * 200).map { IntegerGene.of(/*rnd.nextInt(-1000, 1000)*/1, -1000, 1000) }.chunked(12).chunked(49)
-                }
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(12).chunked(49)
+//                val weights = ThreadLocalRandom.current().let { rnd ->
+//                    (0..12 * 49 * 200).map { IntegerGene.of(/*rnd.nextInt(-1000, 1000)*/1, -1000, 1000) }.chunked(12).chunked(49)
+//                }
                 genotypes = weights.map {w -> Genotype.of(w.map { IntegerChromosome.of(it) })}
             }
         }
@@ -78,8 +79,8 @@ class MayhemApplication() : ApplicationRunner {
     fun eventLoopGroup() = NioEventLoopGroup()
 }
 
-private fun EvolutionResult<IntegerGene, Float>.weights() =
-    genotypes().flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
+private fun ISeq<Genotype<IntegerGene>>.weights() =
+    flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
 
 fun main(args: Array<String>) {
     runApplication<MayhemApplication>(*args)

@@ -13,7 +13,6 @@ import io.netty.channel.EventLoopGroup
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
 import org.testcontainers.utility.DockerImageName
 import java.net.InetAddress
@@ -37,9 +36,10 @@ class MayhemEvaluator(
 
         val serverConfig = ServerConfigurationProperties(
             InetAddress.getByName(container.containerIpAddress),
-            container.getMappedPort(1337)
+            container.getMappedPort(1337),
+            container.getMappedPort(8080)
         )
-        log.info(serverConfig.toString())
+        log.info("Starting matches, watch them at http://${serverConfig.address}:${serverConfig.webPort}")
 
         val client = MayhemClient(serverConfig, eventLoopGroup, objectMapper, accountGenerator)
         val futures = population.map { phenotype -> client.play(GeneticGameStrategy(phenotype.genotype())) }.toList()
