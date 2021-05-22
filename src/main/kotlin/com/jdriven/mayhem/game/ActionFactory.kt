@@ -5,12 +5,12 @@ import ninja.robbert.mayhem.api.Hero.Skill.EffectType.*
 import ninja.robbert.mayhem.api.StatusMessage
 import kotlin.math.abs
 
-class ActionFactory(
-    private val player: Player,
-    private val skill: Skill,
-    private val targetTeam: Team,
-    private val targetPlayer: Player,
-    private val weights: List<Int>
+data class ActionFactory(
+    val player: Player,
+    val skill: Skill,
+    val targetTeam: Team,
+    val targetPlayer: Player,
+    val weights: List<Int>
 ) {
 
     fun getAction(statusMessage: StatusMessage): Action? {
