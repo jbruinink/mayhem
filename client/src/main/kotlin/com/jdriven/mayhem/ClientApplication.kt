@@ -19,13 +19,12 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
-import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.streams.toList
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-class MayhemApplication() : ApplicationRunner {
+class ClientApplication() : ApplicationRunner {
 
     @Autowired
     lateinit var engine: Engine<IntegerGene, Float>
@@ -76,5 +75,5 @@ private fun ISeq<Genotype<IntegerGene>>.weights() =
     flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
 
 fun main(args: Array<String>) {
-    runApplication<MayhemApplication>(*args)
+    runApplication<ClientApplication>(*args)
 }

@@ -1,0 +1,5 @@
+mayhem:
+  server:
+    address: localhost
+    gamePort: 1338
+    webPort: 8080

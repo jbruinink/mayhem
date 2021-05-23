@@ -24,7 +24,8 @@ import java.util.concurrent.CompletableFuture
 class MayhemEvaluator(
     val eventLoopGroup: EventLoopGroup,
     val objectMapper: ObjectMapper,
-    val accountGenerator: AccountGenerator
+    val accountGenerator: AccountGenerator,
+    val serverConfigurationProperties: ServerConfigurationProperties
 ) : Evaluator<IntegerGene, Float> {
     private val log = LoggerFactory.getLogger(MayhemEvaluator::class.java)
 

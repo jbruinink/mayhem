@@ -29,7 +29,7 @@ class MayhemClient(
 //                    LoggingHandler(LogLevel.INFO),
                     LineBasedFrameDecoder(Int.MAX_VALUE),
                     LineBasedFrameEncoder(),
-                    MayhemMessageCodec(objectMapper),
+                    MayhemClientMessageCodec(objectMapper),
                     protocolHandler
                 )
             }

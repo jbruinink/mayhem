@@ -8,13 +8,13 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.ByteToMessageCodec
 import ninja.robbert.mayhem.api.InputMessage
 import ninja.robbert.mayhem.api.OutputMessage
-import java.io.InputStream
 import java.io.OutputStream
 
-class MayhemMessageCodec(private val objectMapper: ObjectMapper) : ByteToMessageCodec<InputMessage>() {
+class MayhemClientMessageCodec(private val objectMapper: ObjectMapper) : ByteToMessageCodec<InputMessage>() {
     override fun decode(ctx: ChannelHandlerContext, buf: ByteBuf, out: MutableList<Any>) {
-        ByteBufInputStream(buf).use {
-            out.add(objectMapper.readValue(it as InputStream, OutputMessage::class.java))
+        ByteBufInputStream(buf).bufferedReader().use {
+            val input = it.readLine()
+            out.add(objectMapper.readValue(input, OutputMessage::class.java))
         }
     }
 
