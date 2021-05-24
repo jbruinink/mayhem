@@ -21,14 +21,27 @@ class GeneticGameStrategy(genotype: Genotype<IntegerGene>) : GameStrategy {
         }
     }
 
-    override fun createResponse(msg: StatusMessage): Action? {
+    fun createUnfilteredResponse(msg: StatusMessage):Map<Int, List<Action>> {
+        return if (msg.status == StatusMessage.FightStatus.fighting || msg.status == StatusMessage.FightStatus.overtime) {
+            actionFactories
+                .mapNotNull { it.getAction(msg) }
+                .groupBy { candidate -> candidate.heroId }
+        } else {
+            emptyMap()
+        }
+    }
+
+    override fun createResponse(msg: StatusMessage): Collection<Action> {
         return if (msg.status == StatusMessage.FightStatus.fighting || msg.status == StatusMessage.FightStatus.overtime) {
             actionFactories
                 .mapNotNull { it.getAction(msg) }
                 .filter { it.score > 0 }
-                .maxByOrNull { it.score }
+                .groupBy { candidate -> candidate.heroId }
+                .mapNotNull { (_, v) ->
+                    v.maxByOrNull { it.score }
+                }
         } else {
-            null
+            listOf()
         }
     }
 }

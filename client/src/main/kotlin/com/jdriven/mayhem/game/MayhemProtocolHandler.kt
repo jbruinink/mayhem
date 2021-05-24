@@ -62,10 +62,9 @@ class MayhemProtocolHandler(
                 resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
             }
         } else {
-            strategy.createResponse(msg)?.let {
+            strategy.createResponse(msg).forEach {
                 ctx.writeAndFlush(ActionMessage(it.heroId, it.skill.id, it.targetId, false))
             }
-
         }
     }
 

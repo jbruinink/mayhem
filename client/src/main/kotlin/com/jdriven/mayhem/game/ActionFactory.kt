@@ -19,25 +19,31 @@ data class ActionFactory(
         val skill = hero.skills.first { it.name == skill.text }
 
         if (!hero.isAlive || hero.isBusy || hero.power + skill.power < 0 || hero.cooldowns.contains(skill.id) ||
-            !target.isAlive || target.buffs.contains(skill.name)
+            !target.isAlive
         ) {
             return null
         }
 
-        val state = mapState(skill, target)
+        val state = mapState(skill, target, statusMessage.timestamp.time)
 
         val score = state.zip(weights).sumOf { (a, b) -> a * b }
 
         return Action(hero.id, skill, target.id, score)
     }
 
-    private fun mapState(skill: Hero.Skill, target: Hero): List<Int> {
+    private fun mapState(skill: Hero.Skill, target: Hero, time: Long): List<Int> {
         val bias = 500
         val (effect, expectedKill) = normalizedEffect(skill, target)
+        val durationLeft: Int = if (skill.duration > 0) {
+            target.buffs[skill.name]?.timeout?.minus(time)?.toInt() ?: 0
+        } else {
+            0
+        }
 
         return listOf(
             bias,
             effect,
+            durationLeft,
             (target.health * 1000) / 600,
             expectedKill
         )
@@ -53,24 +59,25 @@ data class ActionFactory(
         }
 
         val effect = if (skill.effect > 0 || skill.type == resistance || skill.type == armor) {
-            skill.effect
+            abs(skill.effect)
         } else {
             skill.effect * -1 * (200 - target.resistance) * (100 - target.armor) / (200 * 100)
         }
 
-        return if (skill.effect > 0) {
+        val actualEffect = if (skill.effect > 0) {
             //can't give more than max - current
-            Pair(effect.coerceAtMost(max - current), 0)
+            effect.coerceAtMost(max - current)
         } else {
             //can't take more than current
-            Pair(
-                effect.coerceAtMost(current) * 1000 / abs(skill.effect), if (effect > target.health) {
-                    1000
-                } else {
-                    0
-                }
-            )
+            effect.coerceAtMost(current) * 1000 / abs(skill.effect)
         }
+
+        val expectedKill = if (skill.type == health && skill.effect < 0 && actualEffect >= target.health) {
+            1000
+        } else {
+            0
+        }
+        return Pair(actualEffect, expectedKill)
     }
 
     private fun targetTeam(statusMessage: StatusMessage) = when (targetTeam) {

@@ -1,6 +1,7 @@
 package com.jdriven.mayhem
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.jdriven.mayhem.game.StatusResponse
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageCodec
 import ninja.robbert.mayhem.api.ActionMessage
@@ -21,7 +22,7 @@ class GameRecorder(private val objectMapper: ObjectMapper) : MessageToMessageCod
             (msg.status == StatusMessage.FightStatus.fighting || msg.status == StatusMessage.FightStatus.overtime)
         ) {
             statusMessage?.let {
-                writer.println(objectMapper.writeValueAsString(RequestResponse(it, actionMessages)))
+                writer.println(objectMapper.writeValueAsString(StatusResponse(it, actionMessages)))
             }
             actionMessages.clear()
             statusMessage = msg
@@ -41,4 +42,3 @@ class GameRecorder(private val objectMapper: ObjectMapper) : MessageToMessageCod
     }
 }
 
-data class RequestResponse(val statusMessage: StatusMessage, val actionMessages: MutableList<ActionMessage>)

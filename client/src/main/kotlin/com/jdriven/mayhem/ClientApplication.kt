@@ -19,6 +19,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
+import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.streams.toList
 
@@ -27,10 +28,10 @@ import kotlin.streams.toList
 class ClientApplication() : ApplicationRunner {
 
     @Autowired
-    lateinit var engine: Engine<IntegerGene, Float>
+    lateinit var engine: Engine<IntegerGene, Int>
 
     override fun run(args: ApplicationArguments?) {
-        val statistics: EvolutionStatistics<Float, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
+        val statistics: EvolutionStatistics<Int, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
             .limit(5000)
@@ -51,12 +52,20 @@ class ClientApplication() : ApplicationRunner {
         private val genotypes: List<Genotype<IntegerGene>>
 
         init {
+            val chromosomeLength = 5
+            val geneLength = 49
+
             BufferedReader(FileReader("weights.txt")).use { reader ->
-                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }.toList().chunked(4).chunked(49)
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }
+                    .toList()
+                    .chunked(chromosomeLength)
+                    .chunked(geneLength)
 //                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..4 * 49 * 200).map { IntegerGene.of(0, -1000, 1000) }.chunked(4).chunked(49)
+//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(-100, 100), -1000, 1000) }
+//                        .chunked(4)
+//                        .chunked(49)
 //                }
-                genotypes = weights.map {w -> Genotype.of(w.map { IntegerChromosome.of(it) })}
+                genotypes = weights.map { w -> Genotype.of(w.map { IntegerChromosome.of(it) }) }
             }
         }
 
@@ -72,7 +81,7 @@ class ClientApplication() : ApplicationRunner {
 }
 
 private fun ISeq<Genotype<IntegerGene>>.weights() =
-    flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) }}
+    flatMap { it.flatMap { chromosome -> chromosome.map(IntegerGene::allele) } }
 
 fun main(args: Array<String>) {
     runApplication<ClientApplication>(*args)
