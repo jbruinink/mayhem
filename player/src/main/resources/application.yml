@@ -2,5 +2,5 @@ mayhem:
   server:
 #    address: mayhem.jdriven.com
     address: localhost
-    gamePort: 1337
+    gamePort: 1338
     webPort: 8080
