@@ -13,6 +13,6 @@ class FactorMutator(p: Double, private val factor:Double) : Mutator<IntegerGene,
     }
 
     override fun mutate(gene: IntegerGene, random: Random?): IntegerGene {
-        return gene.newInstance(gene.doubleValue() * factor)
+        return gene.newInstance((gene.doubleValue() * factor).coerceIn(gene.min().toDouble(), gene.max().toDouble()))
     }
 }
