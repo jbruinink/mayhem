@@ -19,6 +19,7 @@ import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.PrintWriter
+import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.streams.toList
 
@@ -62,7 +63,7 @@ class TrainerApplication() : ApplicationRunner {
                     .chunked(chromosomeLength)
                     .chunked(geneLength)
 //                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(min / 2, max / 2), min, max) }
+//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(min, max), min, max) }
 //                        .chunked(chromosomeLength)
 //                        .chunked(geneLength)
 //                }
