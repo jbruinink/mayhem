@@ -28,10 +28,10 @@ import kotlin.streams.toList
 class ClientApplication() : ApplicationRunner {
 
     @Autowired
-    lateinit var engine: Engine<IntegerGene, Int>
+    lateinit var engine: Engine<IntegerGene, Long>
 
     override fun run(args: ApplicationArguments?) {
-        val statistics: EvolutionStatistics<Int, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
+        val statistics: EvolutionStatistics<Long, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
             .limit(5000)

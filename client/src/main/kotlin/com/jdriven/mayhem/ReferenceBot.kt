@@ -9,6 +9,7 @@ import ninja.robbert.mayhem.api.StatusMessage
 import org.springframework.stereotype.Component
 import java.io.BufferedReader
 import java.io.FileReader
+import kotlin.math.absoluteValue
 import kotlin.streams.asSequence
 
 @Component
@@ -19,12 +20,12 @@ class ReferenceBot(objectMapper: ObjectMapper) {
             .map { it.statusMessage to it.actionMessages }
             .toMap()
 
-    fun fitness(genotype: Genotype<IntegerGene>): Int {
+    fun fitness(genotype: Genotype<IntegerGene>): Long {
         val strategy = GeneticGameStrategy(genotype)
 
         return responses
             .map { (status, reference) ->
-                var error = 0
+                var error = 0L
 
                 val actual = strategy.createUnfilteredResponse(status)
 

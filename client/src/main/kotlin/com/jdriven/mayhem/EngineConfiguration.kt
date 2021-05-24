@@ -1,11 +1,8 @@
 package com.jdriven.mayhem
 
 import io.jenetics.*
-import io.jenetics.engine.Codecs
 import io.jenetics.engine.Engine
 import io.jenetics.util.Factory
-import io.jenetics.util.ISeq
-import io.jenetics.util.Seq
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -14,7 +11,7 @@ class EngineConfiguration {
 
     @Bean
     fun engine(referenceBot: ReferenceBot,
-               factory: Factory<Genotype<IntegerGene>>): Engine<IntegerGene, Int> {
+               factory: Factory<Genotype<IntegerGene>>): Engine<IntegerGene, Long> {
 
         return Engine.builder(referenceBot::fitness, factory)
             .populationSize(2000)
