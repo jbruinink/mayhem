@@ -22,8 +22,9 @@
 
     <modules>
         <module>common</module>
-        <module>client</module>
-        <module>server</module>
+        <module>player</module>
+        <module>recorder</module>
+        <module>trainer</module>
     </modules>
 
     <dependencies>
