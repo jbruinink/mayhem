@@ -54,16 +54,18 @@ class ClientApplication() : ApplicationRunner {
         init {
             val chromosomeLength = 5
             val geneLength = 49
+            val min = -1500
+            val max = 1500
 
             BufferedReader(FileReader("weights.txt")).use { reader ->
-                val weights = reader.lines().map { IntegerGene.of(it.toInt(), -1000, 1000) }
+                val weights = reader.lines().map { IntegerGene.of(it.toInt(), min, max) }
                     .toList()
                     .chunked(chromosomeLength)
                     .chunked(geneLength)
 //                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(-100, 100), -1000, 1000) }
-//                        .chunked(4)
-//                        .chunked(49)
+//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(min / 2, max / 2), min, max) }
+//                        .chunked(chromosomeLength)
+//                        .chunked(geneLength)
 //                }
                 genotypes = weights.map { w -> Genotype.of(w.map { IntegerChromosome.of(it) }) }
             }

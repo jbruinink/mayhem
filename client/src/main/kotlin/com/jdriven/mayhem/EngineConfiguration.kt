@@ -20,7 +20,7 @@ class EngineConfiguration {
                 GaussianMutator(0.003),
                 FactorMutator(0.01, 0.95)
             )
-            .selector(EliteSelector(10, RouletteWheelSelector()))
+            .selector(EliteSelector(10, TournamentSelector()))
             .optimize(Optimize.MINIMUM)
             .build()
     }
