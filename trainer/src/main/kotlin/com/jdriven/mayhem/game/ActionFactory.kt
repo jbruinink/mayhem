@@ -32,7 +32,7 @@ data class ActionFactory(
     }
 
     private fun mapState(skill: Hero.Skill, target: Hero, time: Long): List<Int> {
-        val bias = 500
+        val bias = 50
         val (effect, expectedKill) = normalizedEffect(skill, target)
         val durationLeft: Int = if (skill.duration > 0) {
             target.buffs[skill.name]?.timeout?.minus(time)?.toInt() ?: 0

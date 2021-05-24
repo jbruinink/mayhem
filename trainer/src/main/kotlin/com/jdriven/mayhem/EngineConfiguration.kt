@@ -14,9 +14,10 @@ class EngineConfiguration {
                factory: Factory<Genotype<IntegerGene>>): Engine<IntegerGene, Long> {
 
         return Engine.builder(referenceBot::fitness, factory)
-            .populationSize(2000)
+            .populationSize(3000)
             .alterers(
-                MultiPointCrossover(0.2, 2),
+                LineCrossover(0.1, 1.05),
+                MultiPointCrossover(0.1, 2),
                 GaussianMutator(0.003),
                 FactorMutator(0.01, 0.99),
                 FactorMutator(0.01, 1.01)
