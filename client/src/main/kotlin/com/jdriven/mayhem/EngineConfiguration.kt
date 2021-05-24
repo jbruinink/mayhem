@@ -17,7 +17,8 @@ class EngineConfiguration {
             .populationSize(2000)
             .alterers(
                 LineCrossover(0.4, 1.1),
-                GaussianMutator(0.003)
+                GaussianMutator(0.003),
+                FactorMutator(0.01, 0.95)
             )
             .selector(EliteSelector(10, RouletteWheelSelector()))
             .optimize(Optimize.MINIMUM)
