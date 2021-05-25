@@ -34,17 +34,18 @@ data class ActionFactory(
     private fun mapState(skill: Hero.Skill, target: Hero, time: Long): List<Int> {
         val bias = 50
         val (effect, expectedKill) = normalizedEffect(skill, target)
-        val durationLeft: Int = if (skill.duration > 0) {
-            target.buffs[skill.name]?.timeout?.minus(time)?.toInt() ?: 0
+        val buff = target.buffs[skill.name]
+        val durationLeft = if (skill.duration > 0 && buff != null) {
+            (buff.timeout - time - skill.delay).toInt().coerceAtLeast(0) ?: 0
         } else {
             0
-        }
+        } / 100
 
         return listOf(
             bias,
             effect,
             durationLeft,
-            (target.health * 1000) / 600,
+            target.health / 6,
             expectedKill
         )
     }
@@ -52,28 +53,33 @@ data class ActionFactory(
     private fun normalizedEffect(skill: Hero.Skill, target: Hero): Pair<Int, Int> {
 
         val (current: Int, max: Int) = when (skill.type) {
-            health -> Pair(target.health, target.maxHealth)
+            health -> if (skill.duration > 0) {
+                Pair(target.maxHealth, target.maxHealth + 100)
+            } else {
+                Pair(target.health, target.maxHealth)
+            }
             power -> Pair(target.power, target.maxPower)
             armor -> Pair(target.armor, 100)
             resistance -> Pair(target.resistance, 100)
         }
 
-        val effect = if (skill.effect > 0 || skill.type == resistance || skill.type == armor) {
-            abs(skill.effect)
-        } else {
-            skill.effect * -1 * (200 - target.resistance) * (100 - target.armor) / (200 * 100)
-        }
+        val effect =
+            if (skill.effect > 0 || skill.type == resistance || skill.type == armor || skill.duration > 0) {
+                abs(skill.effect)
+            } else {
+                skill.effect * -1 * (200 - target.resistance) * (100 - target.armor) / (200 * 100)
+            }
 
         val actualEffect = if (skill.effect > 0) {
             //can't give more than max - current
             effect.coerceAtMost(max - current)
         } else {
             //can't take more than current
-            effect.coerceAtMost(current) * 1000 / abs(skill.effect)
+            effect.coerceAtMost(current) * 100 / abs(skill.effect)
         }
 
         val expectedKill = if (skill.type == health && skill.effect < 0 && actualEffect >= target.health) {
-            1000
+            100
         } else {
             0
         }
