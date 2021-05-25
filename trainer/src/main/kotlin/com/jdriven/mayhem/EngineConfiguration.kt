@@ -17,10 +17,10 @@ class EngineConfiguration {
             .populationSize(2000)
             .alterers(
                 MultiPointCrossover(0.2, 2),
-                LineCrossover(0.2, 1.1),
+                LineCrossover(0.2, 1.01),
                 GaussianMutator(0.003),
-                FactorMutator(0.01, 0.99),
-                FactorMutator(0.01, 1.05)
+                FactorMutator(0.01, 0.999),
+                FactorMutator(0.01, 1.001)
             )
             .selector(EliteSelector(10, TournamentSelector()))
             .optimize(Optimize.MINIMUM)

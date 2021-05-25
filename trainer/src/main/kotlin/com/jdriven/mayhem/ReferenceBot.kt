@@ -34,15 +34,15 @@ class ReferenceBot(objectMapper: ObjectMapper) {
                         actual[msg.hero]?.firstOrNull() { it.skill.id == msg.skill && it.targetId == msg.target }?.score
 
                     if (scoreOfReferenceAction != null) {
-                        error += if (scoreOfReferenceAction < 0) {
-                            -scoreOfReferenceAction
-                        } else {
-                            0
+                        if (scoreOfReferenceAction < 0) {
+                            error -= scoreOfReferenceAction
                         }
 
                         error += actual[msg.hero]?.sumOf { action ->
-                            if (action.score > scoreOfReferenceAction) {
-                                action.score - scoreOfReferenceAction
+                            if ((action.heroId != msg.hero || action.skill.id != msg.skill || action.targetId != msg.target) &&
+                                action.score >= scoreOfReferenceAction
+                            ) {
+                                100000 + action.score - scoreOfReferenceAction
                             } else {
                                 0
                             }
@@ -55,7 +55,7 @@ class ReferenceBot(objectMapper: ObjectMapper) {
                 error += actual
                     .filter { (key, _) -> reference.none { it.hero == key } }
                     .flatMap { (_, value) -> value.filter { it.score > 0 } }
-                    .sumOf { it.score }
+                    .sumOf { it.score + 100000 }
 
                 error
             }.sum()
