@@ -21,7 +21,8 @@ class EngineConfiguration {
                 GaussianMutator(0.003),
                 FactorMutator(0.01, 0.98),
                 FactorMutator(0.01, 1.02),
-                AddMutator(0.05, 1)
+                AddMutator(0.1, 1),
+                AddMutator(0.1, -1)
             )
             .selector(EliteSelector(10, TournamentSelector()))
             .optimize(Optimize.MINIMUM)
