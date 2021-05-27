@@ -41,11 +41,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.jenetics</groupId>
-            <artifactId>jenetics</artifactId>
-            <version>6.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <version>1.15.3</version>

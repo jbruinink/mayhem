@@ -1,13 +1,8 @@
 package com.jdriven.mayhem
 
+import com.jdriven.mayhem.game.GeneticGameStrategy
 import com.jdriven.mayhem.game.MayhemClient
 import io.jenetics.*
-import io.jenetics.engine.Engine
-import io.jenetics.engine.EvolutionResult
-import io.jenetics.engine.EvolutionStatistics
-import io.jenetics.stat.DoubleMomentStatistics
-import io.jenetics.util.Factory
-import io.jenetics.util.ISeq
 import io.netty.channel.nio.NioEventLoopGroup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
@@ -17,10 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import java.io.BufferedReader
-import java.io.FileOutputStream
 import java.io.FileReader
-import java.io.PrintWriter
-import java.util.stream.Stream
 import kotlin.streams.toList
 
 @SpringBootApplication

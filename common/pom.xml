@@ -24,6 +24,11 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.jenetics</groupId>
+            <artifactId>jenetics</artifactId>
+            <version>6.2.0</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,10 +1,7 @@
 package com.jdriven.mayhem
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.jdriven.mayhem.game.AccountGenerator
-import com.jdriven.mayhem.game.GameResult
-import com.jdriven.mayhem.game.MayhemClient
-import com.jdriven.mayhem.game.ServerConfigurationProperties
+import com.jdriven.mayhem.game.*
 import io.jenetics.IntegerGene
 import io.jenetics.Phenotype
 import io.jenetics.engine.Evaluator

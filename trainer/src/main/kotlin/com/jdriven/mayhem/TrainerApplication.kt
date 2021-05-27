@@ -54,8 +54,8 @@ class TrainerApplication() : ApplicationRunner {
         init {
             val chromosomeLength = 5
             val geneLength = 49
-            val min = -10000
-            val max = 10000
+            val min = -2000
+            val max = 2000
 
             BufferedReader(FileReader("weights.txt")).use { reader ->
                 val weights = reader.lines().map { IntegerGene.of(it.toInt(), min, max) }

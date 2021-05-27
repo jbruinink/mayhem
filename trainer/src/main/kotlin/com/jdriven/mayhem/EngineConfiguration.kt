@@ -16,11 +16,11 @@ class EngineConfiguration {
         return Engine.builder(referenceBot::fitness, factory)
             .populationSize(2000)
             .alterers(
-                MultiPointCrossover(0.2, 2),
-                LineCrossover(0.2, 1.01),
+                MultiPointCrossover(0.4, 2),
+//                LineCrossover(0.2, 1.01),
                 GaussianMutator(0.003),
-                FactorMutator(0.01, 0.999),
-                FactorMutator(0.01, 1.001)
+                FactorMutator(0.01, 0.95),
+                FactorMutator(0.01, 1.05)
             )
             .selector(EliteSelector(10, TournamentSelector()))
             .optimize(Optimize.MINIMUM)

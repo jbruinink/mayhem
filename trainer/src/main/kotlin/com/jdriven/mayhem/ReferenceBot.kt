@@ -1,6 +1,7 @@
 package com.jdriven.mayhem
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.jdriven.mayhem.game.GeneticGameStrategy
 import com.jdriven.mayhem.game.StatusResponse
 import io.jenetics.Genotype
 import io.jenetics.IntegerGene
@@ -9,7 +10,6 @@ import ninja.robbert.mayhem.api.StatusMessage
 import org.springframework.stereotype.Component
 import java.io.BufferedReader
 import java.io.FileReader
-import kotlin.math.absoluteValue
 import kotlin.streams.asSequence
 
 @Component
