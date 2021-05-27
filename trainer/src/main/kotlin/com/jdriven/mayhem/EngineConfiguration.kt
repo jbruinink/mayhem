@@ -17,7 +17,7 @@ class EngineConfiguration {
             .populationSize(2000)
             .alterers(
                 MultiPointCrossover(0.2, 2),
-                LineCrossover(0.2, 1.05),
+                LineCrossover(0.3, 1.05),
                 GaussianMutator(0.003),
                 FactorMutator(0.01, 0.98),
                 FactorMutator(0.01, 1.02),
