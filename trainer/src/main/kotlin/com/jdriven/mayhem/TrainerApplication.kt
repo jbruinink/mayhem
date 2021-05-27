@@ -4,6 +4,7 @@ import io.jenetics.*
 import io.jenetics.engine.Engine
 import io.jenetics.engine.EvolutionResult
 import io.jenetics.engine.EvolutionStatistics
+import io.jenetics.engine.Limits
 import io.jenetics.stat.DoubleMomentStatistics
 import io.jenetics.util.Factory
 import io.jenetics.util.ISeq
@@ -34,7 +35,7 @@ class TrainerApplication() : ApplicationRunner {
         val statistics: EvolutionStatistics<Long, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
-            .limit(5000)
+            .limit(Limits.byFitnessThreshold(0))
             .peek {
                 statistics.accept(it)
                 println(statistics)
@@ -63,7 +64,7 @@ class TrainerApplication() : ApplicationRunner {
                     .chunked(chromosomeLength)
                     .chunked(geneLength)
 //                val weights = ThreadLocalRandom.current().let { rnd ->
-//                    (0..chromosomeLength * geneLength * 3000).map { IntegerGene.of(rnd.nextInt(min, max), min, max) }
+//                    (0..chromosomeLength * geneLength * 2000).map { IntegerGene.of(rnd.nextInt(min, max), min, max) }
 //                        .chunked(chromosomeLength)
 //                        .chunked(geneLength)
 //                }
