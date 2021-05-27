@@ -16,9 +16,9 @@ class EngineConfiguration {
         return Engine.builder(referenceBot::fitness, factory)
             .populationSize(2000)
             .alterers(
-//                MultiPointCrossover(0.3, 2),
-//                LineCrossover(0.1, 1.05),
-//                GaussianMutator(0.2),
+                MultiPointCrossover(0.3, 2),
+                LineCrossover(0.1, 1.05),
+                GaussianMutator(0.003),
                 FactorMutator(0.01, 0.98),
                 FactorMutator(0.01, 1.02)
             )

@@ -24,14 +24,14 @@ data class ActionFactory(
             return null
         }
 
-        val state = mapState(skill, target, statusMessage.timestamp.time)
+        val state = mapState(hero, skill, target, statusMessage.timestamp.time)
 
         val score = state.zip(weights).sumOf { (a, b) -> a * b }
 
         return Action(hero.id, skill, target.id, score)
     }
 
-    private fun mapState(skill: Hero.Skill, target: Hero, time: Long): List<Int> {
+    private fun mapState(hero: Hero, skill: Hero.Skill, target: Hero, time: Long): List<Int> {
         val bias = 50
         val (effect, expectedKill) = normalizedEffect(skill, target)
         val buff = target.buffs[skill.name]
@@ -46,7 +46,8 @@ data class ActionFactory(
             effect,
             durationLeft,
             target.health / 6,
-            expectedKill
+            expectedKill,
+            hero.power / 3
         )
     }
 

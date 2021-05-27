@@ -25,9 +25,9 @@ class PlayerApplication() : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         val genotype: Genotype<IntegerGene>
 
-        val chromosomeLength = 5
-        val min = -1500
-        val max = 1500
+        val chromosomeLength = 6
+        val min = -2000
+        val max = 2000
 
         BufferedReader(FileReader("bestweights.txt")).use { reader ->
             val weights = reader.lines().map { IntegerGene.of(it.toInt(), min, max) }
