@@ -25,7 +25,7 @@ class PlayerApplication() : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         val genotype: Genotype<IntegerGene>
 
-        val chromosomeLength = 6
+        val chromosomeLength = 5
         val min = -2000
         val max = 2000
 

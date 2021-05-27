@@ -33,7 +33,7 @@ data class ActionFactory(
 
     private fun mapState(hero: Hero, skill: Hero.Skill, target: Hero, time: Long): List<Int> {
         val bias = 50
-        val (effect, expectedKill) = normalizedEffect(skill, target)
+        val effect = normalizedEffect(skill, target)
         val buff = target.buffs[skill.name]
         val durationLeft = if (skill.duration > 0 && buff != null) {
             (buff.timeout - time - skill.delay).toInt().coerceAtLeast(0) ?: 0
@@ -46,12 +46,11 @@ data class ActionFactory(
             effect,
             durationLeft,
             target.health / 6,
-            expectedKill,
             hero.power / 3
         )
     }
 
-    private fun normalizedEffect(skill: Hero.Skill, target: Hero): Pair<Int, Int> {
+    private fun normalizedEffect(skill: Hero.Skill, target: Hero): Int {
 
         val (current: Int, max: Int) = when (skill.type) {
             health -> if (skill.duration > 0) {
@@ -79,12 +78,7 @@ data class ActionFactory(
             effect.coerceAtMost(current) * 100 / abs(skill.effect)
         }
 
-        val expectedKill = if (skill.type == health && skill.effect < 0 && actualEffect >= target.health) {
-            100
-        } else {
-            0
-        }
-        return Pair(actualEffect, expectedKill)
+        return actualEffect
     }
 
     private fun targetTeam(statusMessage: StatusMessage) = when (targetTeam) {

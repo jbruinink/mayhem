@@ -53,7 +53,7 @@ class TrainerApplication() : ApplicationRunner {
         private val genotypes: List<Genotype<IntegerGene>>
 
         init {
-            val chromosomeLength = 6
+            val chromosomeLength = 5
             val geneLength = 49
             val min = -2000
             val max = 2000
