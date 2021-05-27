@@ -19,8 +19,8 @@ class EngineConfiguration {
                 MultiPointCrossover(0.4, 2),
 //                LineCrossover(0.2, 1.01),
                 GaussianMutator(0.003),
-                FactorMutator(0.01, 0.95),
-                FactorMutator(0.01, 1.05)
+                FactorMutator(0.01, 0.98),
+                FactorMutator(0.01, 1.02)
             )
             .selector(EliteSelector(10, TournamentSelector()))
             .optimize(Optimize.MINIMUM)
