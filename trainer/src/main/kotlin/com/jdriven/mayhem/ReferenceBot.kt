@@ -15,8 +15,8 @@ import kotlin.streams.asSequence
 @Component
 class ReferenceBot(objectMapper: ObjectMapper) {
     private val responses: Map<StatusMessage, List<ActionMessage>> =
-        BufferedReader(FileReader("recorded-1621802674330.json")).lines().asSequence()
-//        BufferedReader(FileReader("recorded-1621802675433.json")).lines().asSequence()
+//        BufferedReader(FileReader("recorded-1621802674330.json")).lines().asSequence()
+        BufferedReader(FileReader("recorded-1621802675433.json")).lines().asSequence()
 //        BufferedReader(FileReader("recorded-1621866621375.json")).lines().asSequence()
 //        BufferedReader(FileReader("recorded-1621866649525.json")).lines().asSequence()
 //        BufferedReader(FileReader("recorded-1621871003578.json")).lines().asSequence()
