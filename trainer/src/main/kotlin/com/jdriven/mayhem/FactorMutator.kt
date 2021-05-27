@@ -4,7 +4,7 @@ import io.jenetics.*
 import io.jenetics.internal.math.Probabilities
 import java.util.*
 
-class FactorMutator(p: Double, private val factor:Double) : Mutator<IntegerGene, Long>(p) {
+class FactorMutator(p: Double, private val factor:Double) : Mutator<IntegerGene, Int>(p) {
 
     override fun mutate(
         genotype: Genotype<IntegerGene>?,

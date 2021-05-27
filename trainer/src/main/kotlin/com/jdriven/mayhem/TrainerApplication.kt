@@ -29,13 +29,12 @@ import kotlin.streams.toList
 class TrainerApplication() : ApplicationRunner {
 
     @Autowired
-    lateinit var engine: Engine<IntegerGene, Long>
+    lateinit var engine: Engine<IntegerGene, Int>
 
     override fun run(args: ApplicationArguments?) {
-        val statistics: EvolutionStatistics<Long, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
+        val statistics: EvolutionStatistics<Int, DoubleMomentStatistics> = EvolutionStatistics.ofNumber()
 
         val result = engine.stream()
-            .limit(Limits.byFitnessThreshold(0))
             .peek {
                 statistics.accept(it)
                 println(statistics)

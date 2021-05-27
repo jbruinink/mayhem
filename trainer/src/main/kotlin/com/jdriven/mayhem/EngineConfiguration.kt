@@ -10,11 +10,14 @@ import org.springframework.context.annotation.Configuration
 class EngineConfiguration {
 
     @Bean
-    fun engine(referenceBot: ReferenceBot,
-               factory: Factory<Genotype<IntegerGene>>): Engine<IntegerGene, Long> {
-
-        return Engine.builder(referenceBot::fitness, factory)
-            .populationSize(2000)
+    fun engine(
+        referenceBot: ReferenceBot,
+        evaluator: MayhemEvaluator,
+        factory: Factory<Genotype<IntegerGene>>
+    ): Engine<IntegerGene, Int> =
+//      Engine.builder(referenceBot::fitness, factory)
+        Engine.Builder(evaluator, factory)
+            .populationSize(180)
             .alterers(
                 MultiPointCrossover(0.2, 2),
                 LineCrossover(0.3, 1.05),
@@ -24,7 +27,8 @@ class EngineConfiguration {
                 AddMutator(0.1, 1),
                 AddMutator(0.1, -1)
             )
-            .selector(EliteSelector(10, TournamentSelector()))
-            .optimize(Optimize.MINIMUM)
-            .build()    }
+            .selector(EliteSelector(5, TournamentSelector()))
+//            .optimize(Optimize.MINIMUM)
+            .build()
 }
+

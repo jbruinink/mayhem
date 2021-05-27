@@ -23,24 +23,20 @@ class MayhemEvaluator(
     val objectMapper: ObjectMapper,
     val accountGenerator: AccountGenerator,
     val serverConfigurationProperties: ServerConfigurationProperties
-) : Evaluator<IntegerGene, Float> {
+) : Evaluator<IntegerGene, Int> {
     private val log = LoggerFactory.getLogger(MayhemEvaluator::class.java)
 
-    override fun eval(population: Seq<Phenotype<IntegerGene, Float>>): ISeq<Phenotype<IntegerGene, Float>> {
-        val futures = population.chunked(8).map{list -> play(list)}
+    override fun eval(population: Seq<Phenotype<IntegerGene, Int>>): ISeq<Phenotype<IntegerGene, Int>> {
+        val futures = population.chunked(9).map{list -> play(list)}
 
         return ISeq.of(
             population.zip(futures.flatMap { it.get() })
-                .map<Pair<Phenotype<IntegerGene, Float>, GameResult>, Phenotype<IntegerGene, Float>?> { (phenotype, gameResult) ->
-                    phenotype.withFitness(
-                        4 * gameResult.wins + //win the match
-                                gameResult.kills + //kill the enemy heroes
-                                1000f / gameResult.totalMatchTime
-                    ) // do it quickly
+                .map<Pair<Phenotype<IntegerGene, Int>, GameResult>, Phenotype<IntegerGene, Int>?> { (phenotype, gameResult) ->
+                    phenotype.withFitness(10000 * gameResult.wins + gameResult.healthDifference)
                 })
     }
 
-    fun play(phenotypes: List<Phenotype<IntegerGene, Float>>): CompletableFuture<List<GameResult>> {
+    fun play(phenotypes: List<Phenotype<IntegerGene, Int>>): CompletableFuture<List<GameResult>> {
         val network: Network = Network.newNetwork()
 
         val server: GenericContainer<*> =
@@ -58,21 +54,21 @@ class MayhemEvaluator(
             server.getMappedPort(8080)
         )
 
-//        val mediumBot: GenericContainer<*> =
-//            GenericContainer<Nothing>(DockerImageName.parse("robbert1/mayhem-bots"))
-//            .apply { withLogConsumer(Slf4jLogConsumer(log)) }
-//            .apply { waitingFor(LogMessageWaitStrategy().withRegEx(".+Installed features: \\[[^\\]]*\\]\n")) }
-//                .apply { withNetwork(network) }
-//                .apply { withCommand("server 1 1") }
-//        mediumBot.start()
-
-        val easyBot: GenericContainer<*> =
+        val mediumBot: GenericContainer<*> =
             GenericContainer<Nothing>(DockerImageName.parse("robbert1/mayhem-bots"))
 //            .apply { withLogConsumer(Slf4jLogConsumer(log)) }
 //            .apply { waitingFor(LogMessageWaitStrategy().withRegEx(".+Installed features: \\[[^\\]]*\\]\n")) }
                 .apply { withNetwork(network) }
-                .apply { withCommand("server 0") }
-        easyBot.start()
+                .apply { withCommand("server 1 1") }
+        mediumBot.start()
+
+//        val easyBot: GenericContainer<*> =
+//            GenericContainer<Nothing>(DockerImageName.parse("robbert1/mayhem-bots"))
+//            .apply { withLogConsumer(Slf4jLogConsumer(log)) }
+//            .apply { waitingFor(LogMessageWaitStrategy().withRegEx(".+Installed features: \\[[^\\]]*\\]\n")) }
+//                .apply { withNetwork(network) }
+//                .apply { withCommand("server 0") }
+//        easyBot.start()
 
         log.info("Starting matches, watch them at http://${serverConfig.address.canonicalHostName}:${serverConfig.webPort}")
 
@@ -82,8 +78,8 @@ class MayhemEvaluator(
             .thenApply { futures.map {it.join()} }
 
         return future.whenComplete { _, _ ->
-            easyBot.stop()
-//            mediumBot.stop()
+//            easyBot.stop()
+            mediumBot.stop()
             server.stop()
             network.close()
         }

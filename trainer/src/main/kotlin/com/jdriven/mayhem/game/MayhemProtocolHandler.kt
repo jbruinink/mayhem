@@ -15,6 +15,7 @@ class MayhemProtocolHandler(
     private var matchStart = 0L
     private var totalMatchTime = 0L
     private var kills = 0
+    private var healthDifference = 0
     private var matchesPlayed = 0
     private var matchesWon = 0
 
@@ -51,15 +52,15 @@ class MayhemProtocolHandler(
             totalMatchTime += msg.timestamp.time - matchStart
             matchesPlayed++
             kills += msg.opponent.count { !it.isAlive }
+            healthDifference += msg.you.sumOf { it.health } - msg.opponent.sumOf { it.health}
             if (msg.result == StatusMessage.FightResult.win) {
                 matchesWon++
             }
         }
 
-//        if (msg.competitionResult != null || matchesPlayed >= 8) {
         if (msg.competitionResult != null) {
             ctx.close().addListener {
-                resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
+                resultCallback.invoke(GameResult(matchesWon, healthDifference, totalMatchTime.toInt()))
             }
         } else {
             strategy.createResponse(msg).forEach {

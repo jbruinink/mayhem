@@ -1,16 +1,15 @@
 package com.jdriven.mayhem
 
 import io.jenetics.*
-import io.jenetics.util.Seq
 import java.util.*
 
-class AddMutator(p: Double, private val delta: Int) : Mutator<IntegerGene, Long>(p) {
+class AddMutator(p: Double, private val delta: Int) : Mutator<IntegerGene, Int>(p) {
     override fun mutate(
-        phenotype: Phenotype<IntegerGene, Long>?,
+        phenotype: Phenotype<IntegerGene, Int>?,
         generation: Long,
         p: Double,
         random: Random?
-    ): MutatorResult<Phenotype<IntegerGene, Long>> {
+    ): MutatorResult<Phenotype<IntegerGene, Int>> {
         return super.mutate(phenotype, generation, 1.0, random)
     }
 
