@@ -38,6 +38,7 @@ class PlayerApplication() : ApplicationRunner {
 
         while (true) {
             client.play(GeneticGameStrategy(genotype)).join()
+            Thread.sleep(5000)
         }
     }
 

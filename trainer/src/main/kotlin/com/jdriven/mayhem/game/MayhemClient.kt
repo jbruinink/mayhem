@@ -6,7 +6,9 @@ import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.LineBasedFrameDecoder
+import java.lang.IllegalStateException
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 //@Component
 class MayhemClient(
@@ -34,7 +36,9 @@ class MayhemClient(
                 )
             }
         })
-        bootstrap.connect()
+        if(!bootstrap.connect().await(5, TimeUnit.SECONDS)) {
+            futureResult.completeExceptionally(IllegalStateException("Unable to connect"))
+        }
 
         return futureResult
     }

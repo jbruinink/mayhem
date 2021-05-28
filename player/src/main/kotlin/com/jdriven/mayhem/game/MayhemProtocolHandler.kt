@@ -73,4 +73,8 @@ class MayhemProtocolHandler(
             resultCallback.invoke(GameResult(matchesWon, kills, totalMatchTime.toInt()))
         }
     }
+
+    override fun channelUnregistered(ctx: ChannelHandlerContext?) {
+        resultCallback.invoke(GameResult(0,0,0))
+    }
 }

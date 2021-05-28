@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.LineBasedFrameDecoder
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 @Component
 class MayhemClient(
@@ -17,7 +18,11 @@ class MayhemClient(
 ) {
     fun play(strategy: GameStrategy): CompletableFuture<GameResult> {
         val futureResult = CompletableFuture<GameResult>()
-        val protocolHandler = MayhemProtocolHandler(strategy, Account("R.Dawkins", "w@tchm@k3r!", "jeroen.bruinink+mayhem@jdriven.com"), futureResult::complete)
+        val protocolHandler = MayhemProtocolHandler(
+            strategy,
+            Account("R.Dawkins", "w@tchm@k3r!", "jeroen.bruinink+mayhem@jdriven.com"),
+            futureResult::complete
+        )
 
         val bootstrap = Bootstrap()
         bootstrap.group(eventLoopGroup)
@@ -34,7 +39,9 @@ class MayhemClient(
                 )
             }
         })
-        bootstrap.connect()
+        if (!bootstrap.connect().await(5, TimeUnit.SECONDS)) {
+            futureResult.complete(GameResult(0, 0, 0))
+        }
 
         return futureResult
     }
